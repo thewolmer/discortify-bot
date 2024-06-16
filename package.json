@@ -1,7 +1,6 @@
 {
   "name": "support-discord-bot",
   "module": "index.ts",
-  "type": "module",
   "main": "src/index.ts",
   "scripts": {
     "start": "node build/index.js",
@@ -21,6 +20,7 @@
   },
   "dependencies": {
     "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
     "zod": "^3.23.8"
   }
 }
