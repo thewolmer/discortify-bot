@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                    String    @unique
+  email                 String
+  discord_global_name   String
+  discord_username      String
+  discord_avatar        String?
+  discord_created_at    DateTime
+  spotify_id            String
+  spotify_global_name   String
+  spotify_username      String
+  spotify_avatar        String?
+  spotify_profile_url   String
+  spotify_followers     String
+  spotify_access_token  String?
+  spotify_refresh_token String?
+  spotify_token_expires DateTime?
+}
