@@ -5,7 +5,7 @@ dotenv.config();
 
 const envSchema = z.object({
   DISCORD_TOKEN: z.string().min(1),
-  DISCORD_CLIENT_ID: z.string().min(1),
+  DISCORD_APP_ID: z.string().min(1),
   SERVER_ID: z.string().min(1),
   DISCORD_CLIENT_SECRET: z.string().min(1),
 });
