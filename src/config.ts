@@ -8,6 +8,11 @@ const envSchema = z.object({
   DISCORD_APP_ID: z.string().min(1),
   SERVER_ID: z.string().min(1),
   DISCORD_CLIENT_SECRET: z.string().min(1),
+  SPOTIFY_CLIENT: z.string().min(1),
+  SPOTIFY_CLIENT_SECRET: z.string().min(1),
+  SPOTIFY_REDIRECT_URI: z.string().min(1),
+  DISCORTIFY_API_URL: z.string().min(1),
+  DISCORTIFY_API_KEY: z.string().min(1),
 });
 
 const validConfig = envSchema.safeParse(process.env);

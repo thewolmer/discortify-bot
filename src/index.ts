@@ -1,1 +1,2 @@
-import './bot'
+import './bot';
+import 'module-alias/register';
