@@ -2,7 +2,7 @@ import { env } from '@/config';
 import { User } from '@prisma/client';
 
 export const refreshToken = async (user: User) => {
-  const { spotify_access_token, id } = user;
+  const { spotify_refresh_token, id } = user;
 
   try {
     const response = await fetch(`${env.DISCORTIFY_API_URL}/spotify/refresh`, {
@@ -11,14 +11,17 @@ export const refreshToken = async (user: User) => {
         'Content-Type': 'application/json',
         'X-API-KEY': env.DISCORTIFY_API_KEY,
       },
-      body: JSON.stringify({
-        id,
-        refresh_token: spotify_access_token,
-      }),
+      body: JSON.stringify({ id, refresh_token: spotify_refresh_token }),
     });
-    return response.json();
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error('Failed to refresh Spotify access token: ' + errorData);
+    }
+
+    return await response.json();
   } catch (err) {
-    console.error(err);
-    throw new Error('Failed to refresh spotify access token');
+    console.error('Error refreshing Spotify access token:', err);
+    throw new Error('Failed to refresh Spotify access token: ');
   }
 };

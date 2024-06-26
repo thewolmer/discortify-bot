@@ -23,11 +23,9 @@ export const validateUserAndRefreshToken = async (id: string) => {
     let userData: User | undefined = undefined;
     if (Date.now() > spotify_token_expires.getTime()) {
       const response = await refreshToken(data);
-      console.log('refreshed token', response);
       userData = response;
     } else {
-      userData = data;
-      console.log('No refreshed token', data);
+      userData = data; 
     }
 
     return userData!;

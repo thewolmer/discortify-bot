@@ -19,14 +19,6 @@ export const client = new Client({
   ],
 });
 
-// const player = new Player(client, {
-//   ytdlOptions: {
-//     filter: 'audioonly',
-//     quality: 'highestaudio',
-//     highWaterMark: 1 << 25,
-//   },
-// });
-// player.extractors.loadDefault((ext) => ext !== 'YouTubeExtractor');
 
 client.once('ready', (client) => {
   console.log('🤖 Ready!', client.user?.tag);

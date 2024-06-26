@@ -1,6 +1,7 @@
 import { validateUserAndRefreshToken } from './validateUserAndRefreshToken';
 import { spotifyGet } from './helper';
 
+
 type props = {
   time_range?: 'long_term' | 'medium_term' | 'short_term';
   limit?: number;
@@ -20,5 +21,6 @@ export const getUserTop = async (id: string, { ...props }: props): Promise<Spoti
       ...props,
     },
   });
-  return response.json();
+  console.log('User Top: ', await response.json())
+  return await response.json();
 };
