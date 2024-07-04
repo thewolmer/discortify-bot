@@ -13,11 +13,11 @@ export const validateUserAndRefreshToken = async (id: string) => {
       },
     });
     if (!data) {
-      throw new TypeError('no-linked-account');
+      throw new Error('no-linked-account');
     }
     const { spotify_access_token, spotify_global_name, spotify_token_expires } = data;
     if (!spotify_access_token || !spotify_global_name || !spotify_token_expires) {
-      throw new TypeError('no-credentials');
+      throw new Error('no-credentials');
     }
 
     let userData: User | undefined = undefined;
