@@ -41,11 +41,5 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
-// player.events.on('playerStart', (queue, track) => {
-//   queue.metadata.channel.send(`Started playing **${track.cleanTitle}**!`);
-// });
-// player.events.on('playerError', (queue, error) => {
-//   queue.metadata.channel.send(`An error occurred: ${error.message}`);
-// });
 
 client.login(env.DISCORD_TOKEN);
