@@ -2,7 +2,7 @@ import { User } from '@prisma/client';
 import db from '../db';
 import { refreshToken } from './refreshToken';
 
-export const validateUserAndRefreshToken = async (id: string) => {
+export const validateUserAndRefreshToken = async (id: string): Promise<User> => {
   try {
     if (!id || (id.length !== 17 && id.length !== 18)) {
       throw new TypeError('invalid-user');
@@ -21,18 +21,11 @@ export const validateUserAndRefreshToken = async (id: string) => {
     }
 
     if (Date.now() > spotify_token_expires.getTime()) {
-      const updatedUser = await refreshToken(data);
-      await db.user.update({
-        where: { id },
-        data: {
-          spotify_access_token: updatedUser.spotify_access_token,
-          spotify_token_expires: updatedUser.spotify_token_expires,
-        },
-      });
-      return updatedUser as User;
+      const updatedUser = await refreshToken(data);;
+      return updatedUser
     }
     
-    return data as User;
+    return data
   } catch (err) {
     console.error(err);
     throw new Error('Failed to validate user and refresh token');

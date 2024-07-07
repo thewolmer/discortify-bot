@@ -1,7 +1,7 @@
 import { env } from '@/config';
 import { User } from '@prisma/client';
 
-export const refreshToken = async (user: User) => {
+export const refreshToken = async (user: User): Promise<User> => {
   const { spotify_refresh_token, id } = user;
 
   try {
