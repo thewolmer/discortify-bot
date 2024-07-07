@@ -6,7 +6,8 @@
     "start": "node -r module-alias/register build/index.js",
     "build": "tsc",
     "dev": "concurrently \"tsc -w\" \"nodemon -r module-alias/register build/index.js\"",
-    "deploy:commands": "tsc && node -r module-alias/register build/deploy-commands.js"
+    "deploy:commands": "tsc && node -r module-alias/register build/deploy-commands.js",
+    "download:secrets": "doppler secrets download --no-file --format=env > .env"
   },
   "devDependencies": {
     "@types/bun": "latest",
