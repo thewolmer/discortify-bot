@@ -1,6 +1,8 @@
 import { CommandInteraction, SlashCommandBuilder, User, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, ButtonInteraction } from 'discord.js';
 import { getUserTop } from '../lib/SpotifyAPI/getUserTop';
 import { errorEmbedBuilder } from '@/utils/errorEmbedBuilder';
+import { icons } from '@/lib/Icons';
+import { sendLoadingEmbed } from '@/utils/sendLoadingEmbed';
 
 export const data = new SlashCommandBuilder()
   .setName('top')
@@ -23,13 +25,15 @@ export async function execute(interaction: CommandInteraction) {
   try {
     const data = await getUserTop(user.id, { type: 'tracks', time_range: 'short_term', limit: 10 });
 
-    const embed = new EmbedBuilder()
-      .setDescription(`## Top 10 tracks of ${user.username} \n`)
-      .addFields({
-        name: 'Tracks',
-        value: data.items.map((item, index) => `${index + 1}. **${item.name}** - ${item.artists.map((artist) => artist.name).join(', ')}`).join('\n'),
-      });
+    const tracksFieldValue = data.items.map((item, index) => {
+      const artists = item.artists.map(artist => artist.name);
+      const displayedArtists = artists.length > 3 ? artists.slice(0, 3).join(', ') + `, +${artists.length - 3} more` : artists.join(', ');
+      return `**${index + 1}.** ${icons.music} **[${item.name}](${item.external_urls.spotify})**\n - Album: ${item.album.name}\n - Artist(s): ${displayedArtists}`;
+    }).join('\n');
 
+    const embed = new EmbedBuilder()
+      .setDescription(`## Top 10 tracks of ${user.username} \n${tracksFieldValue}`)
+      .setColor('#2b2d31');
     const shortTermBtn = new ButtonBuilder()
       .setLabel('Last Month')
       .setStyle(ButtonStyle.Secondary)
@@ -56,15 +60,12 @@ export async function execute(interaction: CommandInteraction) {
     });
 
     collector.on('collect', async (buttonInteraction: ButtonInteraction) => {
+      await buttonInteraction.deferUpdate();
       if (buttonInteraction.user.id !== user.id) {
         await buttonInteraction.reply({ content: 'You cannot interact with this button.', ephemeral: true });
         return;
       }
-
-      await buttonInteraction.deferUpdate();
-
       let timeRange: 'short_term' | 'medium_term' | 'long_term';
-
       switch (buttonInteraction.customId) {
         case 'short_term':
           timeRange = 'short_term';
@@ -88,17 +89,19 @@ export async function execute(interaction: CommandInteraction) {
           timeRange = 'short_term';
           break;
       }
-
+      
       try {
+        await sendLoadingEmbed(buttonInteraction);
         const newData = await getUserTop(user.id, { type: 'tracks', time_range: timeRange, limit: 10 });
 
+        const tracksFieldValue = newData.items.map((item, index) => {
+          const artists = item.artists.map(artist => artist.name);
+          const displayedArtists = artists.length > 3 ? artists.slice(0, 3).join(', ') + `, +${artists.length - 3} more` : artists.join(', ');
+          return `**${index + 1}.** ${icons.music} **[${item.name}](${item.external_urls.spotify})**\n - Album: ${item.album.name}\n - Artist(s): ${displayedArtists}`;
+        }).join('\n');
+    
         const newEmbed = new EmbedBuilder()
-          .setDescription(`## Top 10 tracks of ${user.username} \n`)
-          .addFields({
-            name: 'Tracks',
-            value: newData.items.map((item, index) => `${index + 1}. **${item.name}** - ${item.artists.map((artist) => artist.name).join(', ')}`).join('\n'),
-          });
-
+          .setDescription(`## Top 10 tracks of ${user.username} \n${tracksFieldValue}`)
         const newRow = new ActionRowBuilder<ButtonBuilder>()
           .addComponents(shortTermBtn, mediumTermBtn, longTermBtn);
 

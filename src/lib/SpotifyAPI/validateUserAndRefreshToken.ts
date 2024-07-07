@@ -20,15 +20,19 @@ export const validateUserAndRefreshToken = async (id: string) => {
       throw new Error('no-credentials');
     }
 
-    let userData: User | undefined = undefined;
     if (Date.now() > spotify_token_expires.getTime()) {
-      const response = await refreshToken(data);
-      userData = response;
-    } else {
-      userData = data; 
+      const updatedUser = await refreshToken(data);
+      await db.user.update({
+        where: { id },
+        data: {
+          spotify_access_token: updatedUser.spotify_access_token,
+          spotify_token_expires: updatedUser.spotify_token_expires,
+        },
+      });
+      return updatedUser as User;
     }
-
-    return userData!;
+    
+    return data as User;
   } catch (err) {
     console.error(err);
     throw new Error('Failed to validate user and refresh token');
