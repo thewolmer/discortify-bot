@@ -8,7 +8,10 @@ type props = {
   type: 'artists' | 'tracks';
 };
 
-export const getUserTop = async (id: string, { ...props }: props): Promise<SpotifyApi.UsersTopTracksResponse> => {
+export const getUserTop = async (
+  id: string,
+  { ...props }: props,
+): Promise<SpotifyApi.UsersTopTracksResponse | SpotifyApi.UsersTopArtistsResponse> => {
   if (!id || (id.length !== 17 && id.length !== 18)) {
     throw new Error('invalid-user');
   }

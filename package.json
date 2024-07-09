@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "concurrently \"tsc -w\" \"nodemon -r module-alias/register build/index.js\"",
     "deploy:commands": "tsc && node -r module-alias/register build/deploy-commands.js",
-    "download:secrets": "doppler secrets download --no-file --format=env > .env"
+    "download:secrets": "doppler secrets download --project=personal-discortify-bot --config=dev --no-file --format=env > .env"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -37,6 +37,7 @@
     "ffmpeg-static": "^5.2.0",
     "mediaplex": "^0.0.9",
     "module-alias": "^2.2.3",
+    "numbro": "^2.5.0",
     "prisma": "^5.15.1",
     "query-string": "^9.0.0",
     "youtube-ext": "^1.1.25",
