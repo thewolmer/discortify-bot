@@ -12,9 +12,12 @@ import { errorEmbedBuilder } from '@/utils/errorEmbedBuilder';
 import { icons } from '@/lib/Icons';
 import numbro from 'numbro';
 
+// ------------------------------------------------------------------------------------ //
+
 export const data = new SlashCommandBuilder()
   .setName('top')
   .setDescription("Get User's Top 10 items!")
+
   .addSubcommand((subcommand) =>
     subcommand
       .setName('tracks')
@@ -28,6 +31,7 @@ export const data = new SlashCommandBuilder()
       .addMentionableOption((option) => option.setName('user').setDescription('User').setRequired(false)),
   );
 
+// ------------------------------------------------------------------------------------ //
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply();
 
@@ -44,8 +48,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   }
 
   try {
+    // Fetch Data
     const data = await getUserTop(user.id, { type, time_range: 'short_term', limit: 10 });
 
+    // Prepare UI
     const fieldValue = data.items
       .map((item, index) => {
         if (type === 'tracks' && 'album' in item) {
@@ -66,10 +72,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       })
       .join('\n');
 
+    //  Embed
     const embed = new EmbedBuilder()
       .setDescription(`## Top 10 ${type} of ${user.username} \n${fieldValue}`)
       .setColor('#2b2d31');
 
+    //  Buttons
     const shortTermBtn = new ButtonBuilder()
       .setLabel('Last 4 Weeks')
       .setDisabled(true)
@@ -86,8 +94,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .setStyle(ButtonStyle.Secondary)
       .setCustomId(`button-top-${interaction.user.id}-long-${type}`);
 
+    // Action Row
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(shortTermBtn, mediumTermBtn, longTermBtn);
-
+    // Response
     await interaction.followUp({ embeds: [embed], components: [row] });
   } catch (error) {
     console.error('Error fetching top items:', error);
