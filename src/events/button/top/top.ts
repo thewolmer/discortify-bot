@@ -1,5 +1,5 @@
 import { ButtonInteraction, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import { getUserTop } from '../../lib/SpotifyAPI/getUserTop';
+import { getUserTop } from '@/lib/SpotifyAPI/getUserTop';
 import { sendLoadingEmbed } from '@/utils/sendLoadingEmbed';
 import { errorEmbedBuilder } from '@/utils/errorEmbedBuilder';
 import { icons } from '@/lib/Icons';
@@ -11,60 +11,39 @@ async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short
   const [, , userId, , state] = interaction.customId.split('-');
   const user = interaction.user;
   if (userId !== user.id)
-    return await interaction.reply({ content: 'You cannot interact with other users data!', ephemeral: true });
+    return await interaction.followUp({ content: 'You cannot interact with other users data!', ephemeral: true });
 
   // Buttons
 
   const shortTermBtn = new ButtonBuilder()
     .setLabel('Last 4 Weeks')
-    .setDisabled(true)
+    .setDisabled(timeRange === 'short_term')
     .setStyle(ButtonStyle.Secondary)
     .setCustomId(`button-top-${userId}-short-${state}`);
 
   const mediumTermBtn = new ButtonBuilder()
     .setLabel('Last 6 Months')
+    .setDisabled(timeRange === 'medium_term')
     .setStyle(ButtonStyle.Secondary)
     .setCustomId(`button-top-${userId}-medium-${state}`);
 
   const longTermBtn = new ButtonBuilder()
     .setLabel('Last 1 Year')
+    .setDisabled(timeRange === 'long_term')
     .setStyle(ButtonStyle.Secondary)
     .setCustomId(`button-top-${userId}-long-${state}`);
 
-  // Update Button State
+  // Action Row
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(shortTermBtn, mediumTermBtn, longTermBtn);
 
   try {
-    await interaction.deferUpdate();
-    switch (timeRange) {
-      case 'short_term':
-        shortTermBtn.setDisabled(true);
-        mediumTermBtn.setDisabled(false);
-        longTermBtn.setDisabled(false);
-        break;
-      case 'medium_term':
-        shortTermBtn.setDisabled(false);
-        mediumTermBtn.setDisabled(true);
-        longTermBtn.setDisabled(false);
-        break;
-      case 'long_term':
-        shortTermBtn.setDisabled(false);
-        mediumTermBtn.setDisabled(false);
-        longTermBtn.setDisabled(true);
-        break;
-      default:
-        break;
-    }
-
     // Loading Fallback
-
     await sendLoadingEmbed(interaction);
 
     // Fetch Data
-
     const data = await getUserTop(user.id, { type: state as 'tracks' | 'artists', time_range: timeRange, limit: 10 });
 
     // Prepare UI
-
     const fieldValue = data.items
       .map((item, index) => {
         if (state === 'tracks' && 'album' in item) {
@@ -84,12 +63,7 @@ async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short
       })
       .join('\n');
 
-    // Rows
-
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(shortTermBtn, mediumTermBtn, longTermBtn);
-
-    // Replace Data
-
+    // Update Message
     await interaction.editReply({
       embeds: [{ description: `## Top 10 ${state} of ${user.username} \n${fieldValue}` }],
       components: [row],
@@ -97,20 +71,20 @@ async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short
   } catch (error) {
     console.error('Error handling time range:', error);
     const errorEmbed = errorEmbedBuilder(error as Error);
-    await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
+    await interaction.update({ embeds: [errorEmbed], components: [] });
   }
 }
 
 // ------------------------------------------------------------------------------------ //
 
-export async function short(interaction: ButtonInteraction) {
+export async function short({ interaction }: { interaction: ButtonInteraction }) {
   await handleTimeRange(interaction, 'short_term');
 }
 
-export async function medium(interaction: ButtonInteraction) {
+export async function medium({ interaction }: { interaction: ButtonInteraction }) {
   await handleTimeRange(interaction, 'medium_term');
 }
 
-export async function long(interaction: ButtonInteraction) {
+export async function long({ interaction }: { interaction: ButtonInteraction }) {
   await handleTimeRange(interaction, 'long_term');
 }

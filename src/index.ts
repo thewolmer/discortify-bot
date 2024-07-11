@@ -1,10 +1,8 @@
 import 'module-alias/register';
 import { Client } from 'discord.js';
 import { env } from './config';
-import * as eventModules from '@/handlers';
-import { IEventHandler } from './types/event-handler';
-
-const handlers = Object.values(eventModules) as { event: IEventHandler }[];
+import path from 'path';
+const { CommandKit } = require('commandkit');
 
 export const client = new Client({
   intents: [
@@ -20,12 +18,15 @@ export const client = new Client({
   ],
 });
 
-for (const { event } of handlers) {
-  if (event.once) {
-    client.once(event.name, async (...args: any[]) => event.execute(client, ...args));
-  } else {
-    client.on(event.name, async (...args: any[]) => event.execute(client, ...args));
-  }
-}
+new CommandKit({
+  client,
+  commandsPath: path.join(__dirname, 'commands'),
+  eventsPath: path.join(__dirname, 'events'),
+  // validationsPath: path.join(__dirname, 'validations'),
+  devGuildIds: ['1066230569740017664'],
+  devUserIds: ['932865250930360331'],
+  // skipBuiltInValidations: true,
+  bulkRegister: false,
+});
 
 client.login(env.DISCORD_TOKEN);

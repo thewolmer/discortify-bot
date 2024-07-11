@@ -1,23 +1,16 @@
-import {
-  SlashCommandBuilder,
-  User,
-  EmbedBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ActionRowBuilder,
-  ChatInputCommandInteraction,
-} from 'discord.js';
+import { SlashCommandBuilder, User, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } from 'discord.js';
 import { getUserTop } from '../../lib/SpotifyAPI/getUserTop';
 import { errorEmbedBuilder } from '@/utils/errorEmbedBuilder';
 import { icons } from '@/lib/Icons';
 import numbro from 'numbro';
+import { CommandOptions, SlashCommandProps } from 'commandkit';
+import { artistsConcat } from '@/utils/artistsConcat';
 
 // ------------------------------------------------------------------------------------ //
 
 export const data = new SlashCommandBuilder()
   .setName('top')
   .setDescription("Get User's Top 10 items!")
-
   .addSubcommand((subcommand) =>
     subcommand
       .setName('tracks')
@@ -31,10 +24,13 @@ export const data = new SlashCommandBuilder()
       .addMentionableOption((option) => option.setName('user').setDescription('User').setRequired(false)),
   );
 
-// ------------------------------------------------------------------------------------ //
-export async function execute(interaction: ChatInputCommandInteraction) {
-  await interaction.deferReply();
+export const options: CommandOptions = {
+  deleted: false,
+};
 
+// ------------------------------------------------------------------------------------ //
+
+export async function run({ interaction }: SlashCommandProps) {
   const mentionable = interaction.options.get('user');
   const subcommand = interaction.options.getSubcommand();
   const type = subcommand === 'tracks' ? 'tracks' : 'artists';
@@ -56,18 +52,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .map((item, index) => {
         if (type === 'tracks' && 'album' in item) {
           const track = item as SpotifyApi.TrackObjectFull;
-          const artists = track.artists.map((artist) => artist.name);
-          const displayedArtists =
-            artists.length > 3 ? artists.slice(0, 3).join(', ') + `, +${artists.length - 3} more` : artists.join(', ');
-          return `**${index + 1}.** ${icons.music} **[${track.name}](${track.external_urls.spotify})**\n - Album: ${track.album.name}\n - Artist(s): ${displayedArtists}`;
+          const artists = artistsConcat(item.artists, { max: 3 });
+          return `**${index + 1}.** ${icons.music} **[${track.name}](${track.external_urls.spotify})**\n - Album: ${track.album.name}\n - Artist(s): ${artists}`;
         } else if (type === 'artists') {
           const artist = item as SpotifyApi.ArtistObjectFull;
           return `**${index + 1}.** ${icons.music} **[${artist.name}](${artist.external_urls.spotify})**\n - Genres: ${artist.genres.join(', ')}\n - Followers: ${numbro(
             artist.followers.total,
           ).format({
             average: true,
-          })} - Popularity: ${artist.popularity}%
-          `;
+          })} - Popularity: ${artist.popularity}%`;
         }
       })
       .join('\n');
@@ -96,8 +89,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
     // Action Row
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(shortTermBtn, mediumTermBtn, longTermBtn);
+
     // Response
-    await interaction.followUp({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed], components: [row] });
   } catch (error) {
     console.error('Error fetching top items:', error);
     const errorEmbed = errorEmbedBuilder(error as Error);
