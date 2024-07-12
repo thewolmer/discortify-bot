@@ -4,7 +4,7 @@ import { refreshToken } from './refreshToken';
 
 export const validateUserAndRefreshToken = async (id: string): Promise<User> => {
   try {
-    if (!id || (id.length !== 17 && id.length !== 18)) {
+    if (!id || Number(id) < 15) {
       throw new TypeError('invalid-user');
     }
     const data = await db.user.findUnique({
@@ -21,11 +21,11 @@ export const validateUserAndRefreshToken = async (id: string): Promise<User> => 
     }
 
     if (Date.now() > spotify_token_expires.getTime()) {
-      const updatedUser = await refreshToken(data);;
-      return updatedUser
+      const updatedUser = await refreshToken(data);
+      return updatedUser;
     }
-    
-    return data
+
+    return data;
   } catch (err) {
     console.error(err);
     throw new Error('Failed to validate user and refresh token');

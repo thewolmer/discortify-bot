@@ -43,12 +43,14 @@ export async function run({ interaction }: SlashCommandProps) {
     user = interaction.user;
   }
 
+  console.log('User:', user);
+
   try {
     // Fetch Data
-    const data = await getUserTop(user.id, { type, time_range: 'short_term', limit: 10 });
+    const response = await getUserTop(user.id, { type, time_range: 'short_term', limit: 10 });
 
     // Prepare UI
-    const fieldValue = data.items
+    const fieldValue = response.data.items
       .map((item, index) => {
         if (type === 'tracks' && 'album' in item) {
           const track = item as SpotifyApi.TrackObjectFull;
@@ -75,17 +77,17 @@ export async function run({ interaction }: SlashCommandProps) {
       .setLabel('Last 4 Weeks')
       .setDisabled(true)
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId(`button-top-${interaction.user.id}-short-${type}`);
+      .setCustomId(`button-top-${user.id}-short-${type}`);
 
     const mediumTermBtn = new ButtonBuilder()
       .setLabel('Last 6 Months')
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId(`button-top-${interaction.user.id}-medium-${type}`);
+      .setCustomId(`button-top-${user.id}-medium-${type}`);
 
     const longTermBtn = new ButtonBuilder()
       .setLabel('Last 1 Year')
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId(`button-top-${interaction.user.id}-long-${type}`);
+      .setCustomId(`button-top-${user.id}-long-${type}`);
 
     // Action Row
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(shortTermBtn, mediumTermBtn, longTermBtn);

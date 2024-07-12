@@ -1,5 +1,6 @@
 import { validateUserAndRefreshToken } from './validateUserAndRefreshToken';
 import { spotifyGet } from './helper';
+import { User } from '@/types/Discortify';
 
 interface BaseProps {
   limit?: number;
@@ -17,11 +18,13 @@ interface BeforeProps extends BaseProps {
 
 type props = AfterProps | BeforeProps;
 
-export const getUserRecent = async (
-  id: string,
-  { ...props }: props,
-): Promise<SpotifyApi.UsersRecentlyPlayedTracksResponse> => {
-  if (!id || (id.length !== 17 && id.length !== 18)) {
+interface Response {
+  data: SpotifyApi.UsersRecentlyPlayedTracksResponse;
+  user: User;
+}
+
+export const getUserRecent = async (id: string, { ...props }: props): Promise<Response> => {
+  if (!id || Number(id) < 15) {
     throw new Error('invalid-user');
   }
 

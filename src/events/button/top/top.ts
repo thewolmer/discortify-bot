@@ -10,8 +10,8 @@ import numbro from 'numbro';
 async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short_term' | 'medium_term' | 'long_term') {
   const [, , userId, , state] = interaction.customId.split('-');
   const user = interaction.user;
-  if (userId !== user.id)
-    return await interaction.followUp({ content: 'You cannot interact with other users data!', ephemeral: true });
+  // if (userId !== user.id)
+  //   return await interaction.followUp({ content: 'You cannot interact with other users data!', ephemeral: true });
 
   // Buttons
 
@@ -41,10 +41,10 @@ async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short
     await sendLoadingEmbed(interaction);
 
     // Fetch Data
-    const data = await getUserTop(user.id, { type: state as 'tracks' | 'artists', time_range: timeRange, limit: 10 });
+    const data = await getUserTop(userId, { type: state as 'tracks' | 'artists', time_range: timeRange, limit: 10 });
 
     // Prepare UI
-    const fieldValue = data.items
+    const fieldValue = data.data.items
       .map((item, index) => {
         if (state === 'tracks' && 'album' in item) {
           const track = item as SpotifyApi.TrackObjectFull;
@@ -65,7 +65,7 @@ async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short
 
     // Update Message
     await interaction.editReply({
-      embeds: [{ description: `## Top 10 ${state} of ${user.username} \n${fieldValue}` }],
+      embeds: [{ description: `## Top 10 ${state} of ${data.user.discord_username} \n${fieldValue}` }],
       components: [row],
     });
   } catch (error) {

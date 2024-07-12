@@ -1,5 +1,6 @@
 import { validateUserAndRefreshToken } from './validateUserAndRefreshToken';
 import { spotifyGet } from './helper';
+import { User } from '@/types/Discortify';
 
 type props = {
   time_range?: 'long_term' | 'medium_term' | 'short_term';
@@ -8,11 +9,13 @@ type props = {
   type: 'artists' | 'tracks';
 };
 
-export const getUserTop = async (
-  id: string,
-  { ...props }: props,
-): Promise<SpotifyApi.UsersTopTracksResponse | SpotifyApi.UsersTopArtistsResponse> => {
-  if (!id || (id.length !== 17 && id.length !== 18)) {
+interface Response {
+  data: SpotifyApi.UsersTopTracksResponse | SpotifyApi.UsersTopArtistsResponse;
+  user: User;
+}
+
+export const getUserTop = async (id: string, { ...props }: props): Promise<Response> => {
+  if (!id || Number(id) < 15) {
     throw new Error('invalid-user');
   }
 
@@ -27,5 +30,5 @@ export const getUserTop = async (
   const data = await response.json();
   console.log('User Top:', data);
 
-  return data;
+  return { data, user };
 };

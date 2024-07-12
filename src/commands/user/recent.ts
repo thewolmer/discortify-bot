@@ -32,10 +32,10 @@ export async function run({ interaction }: SlashCommandProps) {
 
   try {
     // Fetch Data
-    const data = await getUserRecent(user.id, { limit: 10 });
+    const response = await getUserRecent(user.id, { limit: 10 });
 
     // Prepare UI
-    const fieldValue = data.items
+    const fieldValue = response.data.items
       .map((item, index) => {
         const artists = artistsConcat(item.track.artists, { max: 3 });
         return `**${index + 1}.** ${icons.music} **[${item.track.name}](${item.track.external_urls.spotify})**\n - **Played - ${formatDistance(item.played_at, new Date(), { addSuffix: true })}**\n - Album: ${item.track.album.name}\n - Artist(s): ${artists}`;
@@ -45,7 +45,7 @@ export async function run({ interaction }: SlashCommandProps) {
     //  Embed
     const embed = new EmbedBuilder()
       .setDescription(`## Recently Played Songs of ${user.username} \n${fieldValue}`)
-      .setThumbnail(data.items[0].track.album.images[0].url)
+      .setThumbnail(response.data.items[0].track.album.images[0].url)
       .setColor('#2b2d31');
 
     // Response
