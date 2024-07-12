@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User } from '@/types/Discortify';
 
 interface Props {
   searchParams?: Record<string, string | number | undefined>;

@@ -1,5 +1,5 @@
 import { env } from '@/config';
-import { User } from '@prisma/client';
+import { User } from '@/types/Discortify';
 
 export const refreshToken = async (user: User): Promise<User> => {
   const { spotify_refresh_token, id } = user;

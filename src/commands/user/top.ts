@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, User, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } from 'discord.js';
-import { getUserTop } from '../../lib/SpotifyAPI/getUserTop';
+import { getUserTop } from '@/lib/SpotifyAPI/getUserTop';
 import { errorEmbedBuilder } from '@/utils/errorEmbedBuilder';
 import { icons } from '@/lib/Icons';
 import numbro from 'numbro';

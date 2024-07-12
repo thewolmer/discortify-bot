@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import db from '../db';
+import db from '@/lib/db';
 import { refreshToken } from './refreshToken';
 
 export const validateUserAndRefreshToken = async (id: string): Promise<User> => {
