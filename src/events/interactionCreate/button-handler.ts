@@ -1,4 +1,4 @@
-import * as eventModules from '@/events/button';
+import * as eventModules from '@/buttons';
 import { ButtonInteraction, Client } from 'discord.js';
 
 const events = Object(eventModules);

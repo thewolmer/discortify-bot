@@ -5,6 +5,7 @@ import { icons } from '@/lib/Icons';
 import numbro from 'numbro';
 import { CommandOptions, SlashCommandProps } from 'commandkit';
 import { artistsConcat } from '@/utils/artistsConcat';
+import { images } from '@/lib/Images';
 
 // ------------------------------------------------------------------------------------ //
 
@@ -55,39 +56,42 @@ export async function run({ interaction }: SlashCommandProps) {
         if (type === 'tracks' && 'album' in item) {
           const track = item as SpotifyApi.TrackObjectFull;
           const artists = artistsConcat(item.artists, { max: 3 });
-          return `**${index + 1}.** ${icons.music} **[${track.name}](${track.external_urls.spotify})**\n - Album: ${track.album.name}\n - Artist(s): ${artists}`;
+          return ` ${icons.music} — **${index + 1}. [${track.name}](${track.external_urls.spotify})**
+          ${icons.space} Album: ${track.album.name}
+          ${icons.space} Artist(s): ${artists}`;
         } else if (type === 'artists') {
           const artist = item as SpotifyApi.ArtistObjectFull;
-          return `**${index + 1}.** ${icons.music} **[${artist.name}](${artist.external_urls.spotify})**\n - Genres: ${artist.genres.join(', ')}\n - Followers: ${numbro(
-            artist.followers.total,
-          ).format({
+          return `**${index + 1}.** ${icons.music} **[${artist.name}](${artist.external_urls.spotify})**
+          ${icons.space} Genres: ${artist.genres.join(', ')} 
+          ${icons.space} Followers: ${numbro(artist.followers.total).format({
             average: true,
           })} - Popularity: ${artist.popularity}%`;
         }
       })
-      .join('\n');
+      .join('\n\n');
 
     //  Embed
     const embed = new EmbedBuilder()
       .setDescription(`## Top 10 ${type} of ${user.username} \n${fieldValue}`)
-      .setColor('#2b2d31');
+      .setColor('#2b2d31')
+      .setImage(images.bottombar);
 
     //  Buttons
     const shortTermBtn = new ButtonBuilder()
       .setLabel('Last 4 Weeks')
       .setDisabled(true)
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId(`button-top-${user.id}-short-${type}`);
+      .setCustomId(`button-top-${user.id}-short-${type}-${interaction.user.id}`);
 
     const mediumTermBtn = new ButtonBuilder()
       .setLabel('Last 6 Months')
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId(`button-top-${user.id}-medium-${type}`);
+      .setCustomId(`button-top-${user.id}-medium-${type}-${interaction.user.id}`);
 
     const longTermBtn = new ButtonBuilder()
       .setLabel('Last 1 Year')
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId(`button-top-${user.id}-long-${type}`);
+      .setCustomId(`button-top-${user.id}-long-${type}-${interaction.user.id}`);
 
     // Action Row
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(shortTermBtn, mediumTermBtn, longTermBtn);
@@ -97,6 +101,6 @@ export async function run({ interaction }: SlashCommandProps) {
   } catch (error) {
     console.error('Error fetching top items:', error);
     const errorEmbed = errorEmbedBuilder(error as Error);
-    await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
+    await interaction.editReply({ embeds: [errorEmbed] });
   }
 }

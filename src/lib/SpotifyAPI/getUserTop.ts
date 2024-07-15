@@ -15,10 +15,6 @@ interface Response {
 }
 
 export const getUserTop = async (id: string, { ...props }: props): Promise<Response> => {
-  if (!id || Number(id) < 15) {
-    throw new Error('invalid-user');
-  }
-
   const user = await validateUserAndRefreshToken(id);
 
   const response = await spotifyGet(`/me/top/${props.type}`, user, {

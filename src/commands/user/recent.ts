@@ -5,6 +5,7 @@ import { CommandOptions, SlashCommandProps } from 'commandkit';
 import { getUserRecent } from '@/lib/SpotifyAPI/getUserRecent';
 import { artistsConcat } from '@/utils/artistsConcat';
 import { formatDistance } from 'date-fns';
+import { images } from '@/lib/Images';
 
 // ------------------------------------------------------------------------------------ //
 
@@ -46,7 +47,8 @@ export async function run({ interaction }: SlashCommandProps) {
     const embed = new EmbedBuilder()
       .setDescription(`## Recently Played Songs of ${user.username} \n${fieldValue}`)
       .setThumbnail(response.data.items[0].track.album.images[0].url)
-      .setColor('#2b2d31');
+      .setColor('#2b2d31')
+      .setImage(images.bottombar);
 
     // Response
     await interaction.editReply({ embeds: [embed] });

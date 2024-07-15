@@ -24,10 +24,6 @@ interface Response {
 }
 
 export const getUserRecent = async (id: string, { ...props }: props): Promise<Response> => {
-  if (!id || Number(id) < 15) {
-    throw new Error('invalid-user');
-  }
-
   const user = await validateUserAndRefreshToken(id);
 
   const response = await spotifyGet(`/me/player/recently-played`, user, {
@@ -37,7 +33,7 @@ export const getUserRecent = async (id: string, { ...props }: props): Promise<Re
   });
 
   const data = await response.json();
-  console.log('User Recents:', data);
 
-  return data;
+  console.log('User Recent:', data);
+  return { data, user };
 };
