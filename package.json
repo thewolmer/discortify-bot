@@ -9,6 +9,7 @@
     "download:secrets": "doppler secrets download --project=personal-discortify-bot --config=dev --no-file --format=env > .env"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.3",
     "@types/bun": "latest",
     "@types/node": "^20.14.2",
     "@types/spotify-api": "^0.0.25",

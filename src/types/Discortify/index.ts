@@ -1,3 +1,3 @@
-import { User as UserModel } from '@prisma/client';
+import type { User as UserModel } from '@prisma/client';
 
 export type User = UserModel;
