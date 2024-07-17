@@ -50,10 +50,10 @@ async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short
 			.map((item, index) => {
 				if (state === 'tracks' && 'album' in item) {
 					const track = item as SpotifyApi.TrackObjectFull;
-					const displayedArtists = artistsConcat(track.artists, { max: 3 });
-					return ` ${icons.music} — **${index + 1}. [${track.name}](${track.external_urls.spotify})**
-          ${icons.space} Album: ${track.album.name}
-          ${icons.space} Artist(s): ${displayedArtists}`;
+					const displayedArtists = artistsConcat(track.artists, { max: 2 });
+					return `${icons.music} **${index + 1}. [${track.name}](${track.external_urls.spotify})**
+           From: ${track.album.name.length > 18 ? `${track.album.name.slice(0, 18)}...` : track.album.name}
+           By: ${displayedArtists}`;
 				}
 				if (state === 'artists') {
 					const artist = item as SpotifyApi.ArtistObjectFull;
@@ -67,7 +67,8 @@ async function handleTimeRange(interaction: ButtonInteraction, timeRange: 'short
 			.join('\n\n');
 
 		const embed = new EmbedBuilder()
-			.setDescription(`## Top 10 ${state} of ${data.user.discord_username} \n${fieldValue}`)
+			.setTitle(`Top 10 ${state} of ${data.user.discord_username}`)
+			.setDescription(`\n ${fieldValue}`)
 			.setColor('#2b2d31')
 			.setImage(images.bottombar);
 

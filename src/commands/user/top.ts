@@ -56,14 +56,14 @@ export async function run({ interaction }: SlashCommandProps) {
 				if (type === 'tracks' && 'album' in item) {
 					const track = item as SpotifyApi.TrackObjectFull;
 					const artists = artistsConcat(item.artists, { max: 3 });
-					return ` ${icons.music} — **${index + 1}. [${track.name}](${track.external_urls.spotify})**
-          ${icons.space} Album: ${track.album.name}
-          ${icons.space} Artist(s): ${artists}`;
+					return `${icons.music} **${index + 1}. [${track.name}](${track.external_urls.spotify})**
+           From: ${track.album.name.length > 18 ? `${track.album.name.slice(0, 18)}...` : track.album.name}
+           By: ${artists}`;
 				}
 				if (type === 'artists') {
 					const artist = item as SpotifyApi.ArtistObjectFull;
 					return `**${index + 1}.** ${icons.music} **[${artist.name}](${artist.external_urls.spotify})**
-          ${icons.space} Genres: ${artist.genres.join(', ')} 
+          ${icons.space} Genres: ${artist.genres.join(', ')}
           ${icons.space} Followers: ${numbro(artist.followers.total).format({
 						average: true,
 					})} - Popularity: ${artist.popularity}%`;
@@ -73,7 +73,8 @@ export async function run({ interaction }: SlashCommandProps) {
 
 		//  Embed
 		const embed = new EmbedBuilder()
-			.setDescription(`## Top 10 ${type} of ${user.username} \n${fieldValue}`)
+			.setTitle(`Top 10 ${type} of ${user.username}`)
+			.setDescription(`\n ${fieldValue}`)
 			.setColor('#2b2d31')
 			.setImage(images.bottombar);
 
